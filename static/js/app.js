@@ -155,8 +155,25 @@ async function updateStats() {
             const row = document.createElement('tr');
             const totalInv = Object.values(wh.inventory).reduce((a, b) => a + b, 0);
             const usage = (totalInv / wh.capacity * 100).toFixed(1);
-            row.innerHTML = `<td><strong>${wh.location}</strong><br><small>${wh.id}</small></td><td>${JSON.stringify(wh.inventory).replace(/[{}"]/g, '')}</td><td><div class="progress-bar"><div class="progress-fill" style="width: ${usage}%; background: ${usage > 80 ? 'var(--secondary)' : 'var(--primary)'}"></div></div></td><td><button class="badge badge-success">Manage</button></td>`;
+            const status = usage > 90 ? '<span class="badge badge-warning">Critical</span>' : '<span class="badge badge-success">Optimal</span>';
+            
+            row.innerHTML = `
+                <td><strong>${wh.location}</strong><br><small style="color:var(--text-dim); text-transform: uppercase;">${wh.id}</small></td>
+                <td>${JSON.stringify(wh.inventory).replace(/[{}"]/g, '') || "Empty"}</td>
+                <td>
+                    <div style="font-size: 0.8rem; margin-bottom: 5px;">${usage}% (${totalInv}/${wh.capacity})</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${usage}%; background: ${usage > 80 ? 'var(--secondary)' : 'var(--primary)'}"></div></div>
+                </td>
+                <td>${status}</td>
+            `;
             table.appendChild(row);
         });
+
+        const successRate = (state.total_revenue / 50.0) / Math.max(1, (state.total_revenue / 50.0 + state.unfilled_orders)) * 100;
+        const successRateId = document.getElementById('success-rate');
+        if (successRateId) successRateId.textContent = successRate.toFixed(1);
     } catch (e) {}
 }
+
+setInterval(updateStats, 3000);
+updateStats();
