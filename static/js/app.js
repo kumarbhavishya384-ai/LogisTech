@@ -175,5 +175,51 @@ async function updateStats() {
     } catch (e) {}
 }
 
+function switchTab(tab) {
+    document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
+    
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    event.currentTarget.classList.add('active');
+
+    const titles = {
+        'map': ['Global Operations Dashboard', 'Live monitoring of supply chain network'],
+        'wh': ['Warehouse Network Manager', 'Strategic expansion and capacity oversight'],
+        'freight': ['Freight Logistics Hub', 'Transcontinental shipment tracking'],
+        'insights': ['Market Intelligence', 'Predictive demand and route optimization'],
+        'eval': ['Agent Evaluation Matrix', 'Performance analysis benchmarks']
+    };
+    
+    document.getElementById('view-title').textContent = titles[tab][0];
+    document.getElementById('view-tagline').textContent = titles[tab][1];
+
+    if (tab === 'insights') initInsightsChart();
+}
+
+let chart = null;
+function initInsightsChart() {
+    const ctx = document.getElementById('demandChart');
+    if (!ctx || chart) return;
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Day 1', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'],
+            datasets: [{
+                label: 'Global SKU Demand',
+                data: [420, 580, 890, 1100, 950, 1300, 1550],
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } }
+        }
+    });
+}
+
 setInterval(updateStats, 3000);
 updateStats();

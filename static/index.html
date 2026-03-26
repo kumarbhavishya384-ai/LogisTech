@@ -3,31 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogisTech-OpenEnv | Login</title>
+    <title>LogisTech-OpenEnv | Global Network</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body class="auth-page">
     <div class="auth-container">
+        <!-- Dashboard Features Display -->
         <div class="features-panel glass">
-            <div class="brand-badge">LogisTech Ecosystem</div>
-            <h1 style="font-size: 2.5rem; margin-top: 20px;">The Next Generation of <span style="background: linear-gradient(90deg, #6366f1, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Autonomous Logistics.</span></h1>
-            <p style="color: var(--text-dim); margin-top: 20px; line-height: 1.6;">Train and evaluate AI agents in a high-fidelity global supply chain environment. LogisTech-OpenEnv is the gold standard for deterministic logistics simulation.</p>
-            <div class="feature-list" style="margin-top: 40px;">
-                <div class="feature-item"><div class="feature-icon">⛓️</div><div><h4>OpenEnv Compliant</h4><p>Gymnasium-style interface for easy agent integration.</p></div></div>
-                <div class="feature-item"><div class="feature-icon">🛰️</div><div><h4>Global Network</h4><p>Live visibility into warehouses in London, Berlin, and Shanghai.</p></div></div>
-                <div class="feature-item"><div class="feature-icon">🛡️</div><div><h4>Verifiable OTP Security</h4><p>Authenticated onboarding via EmailJS with deterministic grading.</p></div></div>
+            <div class="badge badge-success" style="margin-bottom: 20px;">OpenEnv Certified</div>
+            <h1 style="font-size: 3rem; line-height: 1.1; margin-bottom: 25px;">The Future of <span style="background: linear-gradient(90deg, #6366f1, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Autonomous Supply Chains.</span></h1>
+            <p style="color: var(--text-dim); font-size: 1.1rem; line-height: 1.6; margin-bottom: 40px;">Train and evaluate AI agents in a high-fidelity global network. LogisTech-OpenEnv provides the scale, security, and deterministic grading required for the next generation of logistics.</p>
+            
+            <div class="feature-grid" style="display: grid; gap: 30px;">
+                <div style="display: flex; gap: 20px;">
+                    <div style="font-size: 1.5rem;">⛓️</div>
+                    <div><h4 style="margin-bottom: 5px;">Agentic Interoperability</h4><p style="color: var(--text-dim); font-size: 0.9rem;">Full Gymnasium support with step/reset state persistence.</p></div>
+                </div>
+                <div style="display: flex; gap: 20px;">
+                    <div style="font-size: 1.5rem;">🛰️</div>
+                    <div><h4 style="margin-bottom: 5px;">Global Node Simulation</h4><p style="color: var(--text-dim); font-size: 0.9rem;">Live tracking across London, Berlin, and Shanghai hubs.</p></div>
+                </div>
             </div>
         </div>
+
+        <!-- Authentication Box -->
         <div class="auth-box glass">
-            <h1 class="auth-logo">LogisTech</h1>
-            <div class="tabs"><span class="tab active" data-target="login">Login</span><span class="tab" data-target="register">Register</span></div>
-            <div id="login-form"><div class="input-group"><input type="text" placeholder="Email Address" id="l-email"></div><div class="input-group"><input type="password" placeholder="Password" id="l-pass"></div><button class="btn" onclick="auth('login')">Access Platform</button><a href="#" class="forgot-link" onclick="toggleForgot()">Forgot password?</a></div>
-            <div id="register-form" style="display: none;"><div class="input-group"><input type="text" placeholder="Full Name" id="r-name"></div><div class="input-group"><input type="text" placeholder="Work Email" id="r-email"></div><div class="input-group"><input type="password" placeholder="Create Password" id="r-pass"></div><button class="btn" onclick="requestOtp()">Verify & Sign Up</button></div>
-            <div id="forgot-form" style="display: none;"><div class="input-group"><input type="text" placeholder="Email Address" id="f-email"></div><div class="input-group" id="forgot-pass-group" style="display:none;"><input type="password" placeholder="New Password" id="f-new-pass"></div><button class="btn" id="forgot-btn" onclick="requestOtp('forgot')">Send Reset Code</button><a href="#" class="forgot-link" onclick="toggleForgot()">Back to login</a></div>
+            <div class="dummy-notice">
+                <span>🛡️</span>
+                <span>SYSTEM NOTE: Live Environment is Operational. Additional analytics currently serve as "Intelligence Visualization" via dummy-data pipelines.</span>
+            </div>
+            <h1 class="sidebar-title" style="font-size: 2.2rem; margin-bottom: 30px; background: linear-gradient(to right, #6366f1, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">LogisTech</h1>
+            
+            <div class="tabs" style="display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+                <span class="tab active nav-item" style="padding: 10px 20px; cursor: pointer;" data-target="login">Login</span>
+                <span class="tab nav-item" style="padding: 10px 20px; cursor: pointer;" data-target="register">Register</span>
+            </div>
+
+            <div id="login-form">
+                <div class="form-group"><input type="text" placeholder="Email Address" id="l-email"></div>
+                <div class="form-group"><input type="password" placeholder="Password" id="l-pass"></div>
+                <button class="btn-primary" onclick="auth('login')">Access Platform</button>
+                <p style="margin-top: 20px; font-size: 0.9rem;"><a href="#" style="color: var(--primary); text-decoration: none;" onclick="toggleForgot()">Forgot password?</a></p>
+            </div>
+
+            <div id="register-form" style="display: none;">
+                <div class="form-group"><input type="text" placeholder="Full Name" id="r-name"></div>
+                <div class="form-group"><input type="text" placeholder="Work Email" id="r-email"></div>
+                <div class="form-group"><input type="password" placeholder="Create Password" id="r-pass"></div>
+                <button class="btn-primary" onclick="requestOtp()">Verify & Sign Up</button>
+            </div>
+
+            <div id="forgot-form" style="display: none;">
+                <div class="form-group"><input type="text" placeholder="Registered Email" id="f-email"></div>
+                <div class="form-group" id="forgot-pass-group" style="display:none;"><input type="password" placeholder="New Password" id="f-new-pass"></div>
+                <button class="btn-primary" id="forgot-btn" onclick="requestOtp('forgot')">Send Reset Code</button>
+                <p style="margin-top: 20px; font-size: 0.9rem;"><a href="#" style="color: var(--primary); text-decoration: none;" onclick="toggleForgot()">Back to login</a></p>
+            </div>
         </div>
     </div>
-    <div id="otp-modal" class="modal-overlay" style="display: none;"><div class="modal-content glass"><h2>Verification Required</h2><p>Check your email for the code.</p><div class="input-group"><input type="text" id="otp-input" placeholder="000000" maxlength="6" style="text-align: center; letter-spacing: 5px;"></div><button class="btn" onclick="verifyAndSubmit()">Complete</button><button class="btn-outline" onclick="closeModal()">Cancel</button></div></div>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- OTP Modal -->
+    <div id="otp-modal" class="tab-view" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; filter: blur(0); background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; display: none;">
+        <div class="glass" style="width: 400px; padding: 40px; text-align: center;">
+            <h2 style="margin-bottom: 20px;">🛡️ Check Email</h2>
+            <p style="color: var(--text-dim); margin-bottom: 30px;">An authentication code has been sent to your primary address.</p>
+            <div class="form-group"><input type="text" id="otp-input" placeholder="000 000" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;"></div>
+            <button class="btn-primary" onclick="verifyAndSubmit()">Verify Identity</button>
+            <button class="btn-logout" style="margin-top: 15px; background: transparent; border: none;" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
     <script src="/static/js/app.js"></script>
     <script>
         const tabs = document.querySelectorAll('.tab');
@@ -41,7 +87,11 @@
                 document.getElementById('forgot-form').style.display = 'none';
             });
         });
-        function toggleForgot() { document.getElementById('login-form').style.display = 'none'; document.getElementById('register-form').style.display = 'none'; document.getElementById('forgot-form').style.display = 'block'; }
+        function toggleForgot() { 
+            document.getElementById('login-form').style.display = 'none'; 
+            document.getElementById('register-form').style.display = 'none'; 
+            document.getElementById('forgot-form').style.display = 'block'; 
+        }
         function closeModal() { document.getElementById('otp-modal').style.display = 'none'; }
     </script>
 </body>

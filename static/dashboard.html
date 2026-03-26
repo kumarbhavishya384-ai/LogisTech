@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LogisTech-OpenEnv | Global Dashboard</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dashboard-page">
     <div class="dashboard">
@@ -15,11 +16,11 @@
                 <h2 class="sidebar-title">LOGISTECH</h2>
             </div>
             <nav class="sidebar-nav">
-                <div class="nav-item active">🛰️ Operational Map</div>
-                <div class="nav-item">🏢 Warehouse Manager</div>
-                <div class="nav-item">📦 Freight Logistics</div>
-                <div class="nav-item">📈 Market Insights</div>
-                <div class="nav-item">🤖 Agent Evaluation</div>
+                <div class="nav-item active" onclick="switchTab('map')">🛰️ Operational Map</div>
+                <div class="nav-item" onclick="switchTab('wh')">🏢 Warehouse Manager</div>
+                <div class="nav-item" onclick="switchTab('freight')">📦 Freight Logistics</div>
+                <div class="nav-item" onclick="switchTab('insights')">📈 Market Insights</div>
+                <div class="nav-item" onclick="switchTab('eval')">🤖 Agent Evaluation</div>
             </nav>
             <div class="sidebar-footer">
                 <button class="btn-logout" onclick="logout()">Sign Out</button>
@@ -28,97 +29,107 @@
 
         <!-- Main Workspace -->
         <main class="main-content">
-            <!-- Top Metric Bar -->
             <header class="header-bar glass">
                 <div class="header-left">
-                    <h1 class="page-title">Global Operations Dashboard</h1>
-                    <p class="tagline">Live monitoring of supply chain network</p>
+                    <h1 id="view-title" class="page-title">Global Operations Dashboard</h1>
+                    <p id="view-tagline" class="tagline">Live monitoring of supply chain network</p>
                 </div>
                 <div class="header-right">
                     <div id="current-day" class="day-badge">DAY 0</div>
                 </div>
             </header>
 
-            <div class="stats-grid">
-                <div class="stat-card glass hover-scale">
-                    <span class="stat-label">Total Cash Balance</span>
-                    <h3 class="stat-val">$<span id="cash-bal">0.00</span></h3>
-                    <div class="stat-trend trend-up">↑ 100% (Genesis State)</div>
-                </div>
-                <div class="stat-card glass hover-scale">
-                    <span class="stat-label">Total Revenue</span>
-                    <h3 class="stat-val">$<span id="revenue">0.00</span></h3>
-                    <div class="stat-trend">Tracking Live Orders</div>
-                </div>
-                <div class="stat-card glass hover-scale">
-                    <span class="stat-label">Unfilled Demand</span>
-                    <h3 class="stat-val"><span id="unfilled">0</span> SKU</h3>
-                    <div class="stat-trend trend-down">Stockout Alerts Active</div>
-                </div>
-                <div class="stat-card glass hover-scale">
-                    <span class="stat-label">System Health</span>
-                    <h3 class="stat-val"><span id="success-rate">0</span>%</h3>
-                    <div class="stat-trend">Success Rate</div>
-                </div>
-            </div>
-
-            <div class="ops-grid">
-                <!-- Environment Control (Main Center) -->
-                <section class="ops-panel glass">
-                    <div class="panel-header">
-                        <h3>Environment Controls</h3>
-                        <div class="task-selector">
-                            <select id="task-select" class="glass-select">
-                                <option value="easy">UK Stockout (Easy)</option>
-                                <option value="medium">Shanghai Strike (Medium)</option>
-                                <option value="hard">Black Friday (Hard)</option>
-                            </select>
-                        </div>
+            <!-- TAB 1: OPERATIONAL MAP (LIVE DATA) -->
+            <div id="tab-map" class="tab-view active">
+                <div class="stats-grid">
+                    <div class="stat-card glass">
+                        <span class="stat-label">Total Cash Balance</span>
+                        <h3 class="stat-val">$<span id="cash-bal">0.00</span></h3>
                     </div>
-                    <button class="btn-primary" onclick="startTask()">Reset & Start Environment</button>
-                    
-                    <div class="inventory-section">
-                        <h4>Branch Inventory Status</h4>
+                    <div class="stat-card glass">
+                        <span class="stat-label">Total Revenue</span>
+                        <h3 class="stat-val">$<span id="revenue">0.00</span></h3>
+                    </div>
+                    <div class="stat-card glass">
+                        <span class="stat-label">System Health</span>
+                        <h3 class="stat-val"><span id="success-rate">0</span>%</h3>
+                    </div>
+                </div>
+                <div class="ops-grid">
+                    <section class="ops-panel glass">
+                        <div class="panel-header"><h3>Live Environment</h3></div>
+                        <button class="btn-primary" onclick="startTask()">Reset & Start Environment</button>
                         <div class="table-container">
                             <table class="inventory-table">
-                                <thead>
-                                    <tr>
-                                        <th>Location</th>
-                                        <th>Active SKUs</th>
-                                        <th>Hub Capacity</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="inventory-table">
-                                    <!-- Dynamic Inventory Rows -->
-                                </tbody>
+                                <thead><tr><th>Location</th><th>SKUs</th><th>Capacity</th><th>Status</th></tr></thead>
+                                <tbody id="inventory-table"></tbody>
                             </table>
                         </div>
-                    </div>
-                </section>
-
-                <!-- Action Panel (Right Side) -->
-                <aside class="actions-panel glass">
-                    <h3>Strategic Actions</h3>
-                    
-                    <div class="action-card glass">
-                        <h5>New Warehouse Expansion</h5>
-                        <div class="form-group"><input type="text" id="new-wh-id" placeholder="ID (e.g. WH_US)"></div>
-                        <div class="form-group"><input type="text" id="new-wh-loc" placeholder="Location"></div>
-                        <div class="form-group"><input type="number" id="new-wh-cap" placeholder="Capacity Units"></div>
-                        <button class="btn-action" onclick="addBranch()">Add Hub to Network</button>
-                    </div>
-
-                    <div class="action-card glass" style="margin-top: 20px;">
-                        <h5>Freight Transfer (Logistics)</h5>
+                    </section>
+                    <aside class="actions-panel glass">
+                        <h3>Strategic Transfer</h3>
                         <div class="form-group"><input type="text" id="ship-sku" placeholder="SKU Name"></div>
                         <div class="form-group"><input type="text" id="ship-origin" placeholder="Origin ID"></div>
                         <div class="form-group"><input type="text" id="ship-dest" placeholder="Destination ID"></div>
                         <div class="form-group"><input type="number" id="ship-qty" placeholder="Quantity"></div>
-                        <button class="btn-action secundary" onclick="createShipment()">Initiate Global Transfer</button>
-                    </div>
-                </aside>
+                        <button class="btn-action" onclick="createShipment()">Initiate Global Transfer</button>
+                    </aside>
+                </div>
             </div>
+
+            <!-- TAB 2: WAREHOUSE MANAGER (PREMIUM DUMMY DATA) -->
+            <div id="tab-wh" class="tab-view">
+                <div class="stats-grid">
+                    <div class="stat-card glass">
+                        <span class="stat-label">Total Storage Hubs</span>
+                        <h3 class="stat-val">12 Active</h3>
+                        <div class="stat-trend">+2 This Quarter</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <span class="stat-label">Network Utilization</span>
+                        <h3 class="stat-val">68.4%</h3>
+                        <div class="stat-trend">Optimal Efficiency</div>
+                    </div>
+                </div>
+                <div class="table-container glass">
+                    <table class="inventory-table">
+                        <thead><tr><th>Branch</th><th>Manager</th><th>Op-Cost</th><th>Security Level</th></tr></thead>
+                        <tbody>
+                            <tr><td>WH_BERLIN_CENTER</td><td>Dr. Hans Müller</td><td>$4,200/mo</td><td><span class="badge badge-success">Mil-Grade</span></td></tr>
+                            <tr><td>WH_SHANGHAI_PORT</td><td>Mr. Wei Zhang</td><td>$8,900/mo</td><td><span class="badge badge-warning">High Risk</span></td></tr>
+                            <tr><td>WH_NEW_YORK_HUB</td><td>Sarah Collins</td><td>$12,400/mo</td><td><span class="badge badge-success">Standard</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: MARKET INSIGHTS (CHARTS) -->
+            <div id="tab-insights" class="tab-view">
+                <div class="ops-grid">
+                    <section class="ops-panel glass">
+                        <h3>Global Demand Forecast</h3>
+                        <canvas id="demandChart" style="max-height: 400px;"></canvas>
+                    </section>
+                    <aside class="actions-panel glass">
+                        <h3>Intelligence Reports</h3>
+                        <div class="insight-alert warning">⚠️ Port Congestion detected in Panama Canal</div>
+                        <div class="insight-alert success">✅ GPU Demand rising in South-East Asia</div>
+                    </aside>
+                </div>
+            </div>
+
+            <!-- TAB 4: AGENT EVALUATION -->
+            <div id="tab-eval" class="tab-view">
+                <section class="eval-hero glass">
+                    <h2>AI Agent Performance Metrics</h2>
+                    <p>Current Baseline Score: <strong style="color:var(--primary)">0.763</strong></p>
+                    <div class="matrix-grid">
+                        <div class="matrix-cell"><h4>Reasoning</h4><div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div></div>
+                        <div class="matrix-cell"><h4>Resilience</h4><div class="progress-bar"><div class="progress-fill" style="width: 42%; background:var(--secondary)"></div></div></div>
+                    </div>
+                </section>
+            </div>
+
         </main>
     </div>
 
