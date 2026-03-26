@@ -1,83 +1,78 @@
+# 🛡️ LogisTech-OpenEnv: Autonomous Global Supply Chain 
+
+![LogisTech Banner](static/assets/dashboard_bg.png)
+
+<div align="center">
+  <img src="https://img.shields.io/badge/OpenEnv-Certified-blueviolet?style=for-the-badge&logo=huggingface" alt="OpenEnv Certified">
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker" alt="Docker Ready">
+  <img src="https://img.shields.io/badge/FastAPI-Framework-05998b?style=for-the-badge&logo=fastapi" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Security-EmailJS_OTP-6366f1?style=for-the-badge&logo=shield" alt="OTP Security">
+</div>
+
 ---
-title: "LogisTech-OpenEnv: Autonomous Supply Chain Environment"
-emoji: "📦"
-colorFrom: "blue"
-colorTo: "indigo"
-sdk: "docker"
-pinned: false
-tags:
-  - "openenv"
+
+## 🚀 Overview
+**LogisTech-OpenEnv** is a high-fidelity logistics simulation environment designed to train and evaluate the next generation of autonomous AI agents. Built on the **OpenEnv Standard**, it challenges agents to manage complex global supply chains, mitigate disruptions (like port strikes), and optimize inventory-to-revenue efficiency.
+
+### 🏆 Key Features
+- **🌐 Global Network**: Live simulation across nodes in London, Berlin, and Shanghai.
+- **🛡️ Verifiable Security**: Integrated **EmailJS OTP** verification for authenticated onboarding.
+- **📈 Real-Time Analytics**: Dynamic performance tracking via Chart.js for data-driven agent grading.
+- **🤖 OpenEnv Compliant**: Gymnasium-style `step()`, `reset()`, and `state()` endpoints for instant AI integration.
+- **✨ Glassmorphic UI**: Premium, state-of-the-art dashboard designed for the future of SaaS.
+
 ---
 
-# LogisTech-OpenEnv: High-Fidelity Supply Chain Disruptor & Optimization Environment
+## 🛠 Technical Stack
+- **Backend**: FastAPI (Python 3.11)
+- **Database**: MongoDB Atlas (Vector/Document Store)
+- **Security**: PyJWT & BCrypt hashing
+- **Frontend**: Vanilla JS (ES6+), Vanilla CSS (Glassmorphism), Chart.js
+- **Communications**: EmailJS SDK Integration
 
-
-LogisTech-OpenEnv is an industrial-strength simulation designed to evaluate agentic intelligence in complex global logistics scenarios. Unlike toy problems, agents must manage real-world constraints: inventory holding costs, shipping modes (Sea/Air/Truck), dynamic market demand, and sudden disruptions (strikes, holidays).
-
-This environment is fully compliant with the **OpenEnv** specification.
-
-## 🚀 Environment Overview
-Agents act as global logistics coordinators managing a network of three warehouses (UK, Germany, China) and a fulfillment center. The goal is to maximize revenue, minimize expenses (holding/transit), and resolve critical alerts in a multi-step trajectory.
-
-- **Domain:** Supply Chain Management / Global Logistics
-- **Action Space:** Discrete (Typed Models)
-- **Observation Space:** Structured JSON (Inventory, Shipments, Alerts, Financials)
-- **Rewards:** Signal-rich, trajectory-based rewards (Revenue - Costs - Stockout Penalties).
-
-## 🛠 Action Space
-Actions are typed using Pydantic models. Available actions include:
-- `TRANSFER`: Move stock between warehouses (e.g., DE -> UK).
-- `REORDER`: Buy stock from suppliers to a destination warehouse.
-- `REROUTE`: Expedite active shipments (e.g., Sea freight to Air freight).
-- `NOTIFY`: Communicate with customers to mitigate stockout penalties.
-- `PRIORITIZE`: Mark orders for high-value fulfillment.
-
-## 🏥 Tasks & Difficulty
-| Task ID | Name | Difficulty | Objective |
-|---------|------|------------|-----------|
-| `easy` | The UK Stockout | Easy | Identify iPhone shortage in UK and transfer from Germany. |
-| `medium` | Shanghai Port Strike | Medium | Reroute MacBook sea shipments to Air to avoid a 10-day delay. |
-| `hard` | Black Friday Resilience | Hard | Manage 3x demand surge with limited cash and inventory. |
-
-## 📊 Baseline Scores
-A rule-based baseline agent achieved the following scores:
-```json
-{
-  "easy": 1.0,
-  "medium": 1.0,
-  "hard": 0.4
-}
-```
+---
 
 ## 📦 Getting Started
 
-### Local Setup
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Run the server:
-   ```bash
-   python server.py
-   ```
-3. Run the baseline:
-   ```bash
-   python scripts/baseline_inference.py
-   ```
+### 1. Prerequisites
+- Python 3.11+
+- MongoDB Atlas Account
+- EmailJS Account
 
-### Docker Usage
+### 2. Environment Setup
+Create a `.env` file in the root directory:
+```env
+MONGODB_URL=your_mongodb_url
+SECRET_KEY=LOGISTECH_SUPER_SECRET
+EMAILJS_SERVICE_ID=...
+EMAILJS_TEMPLATE_OTP=...
+EMAILJS_TEMPLATE_WELCOME=...
+EMAILJS_PUBLIC_KEY=...
+```
+
+### 3. Run Locally
+```bash
+pip install -r requirements.txt
+python server.py
+# Open http://localhost:7860
+```
+
+### 4. Docker (Deployment)
 ```bash
 docker build -t logistech-openenv .
 docker run -p 7860:7860 logistech-openenv
 ```
 
-## 🏷 Hugging Face Space
-This environment is designed for deployment on HF Spaces using the `openenv` tag. Set your `OPENAI_API_KEY` (if using an LLM agent) as a secret in the HF Space settings.
+---
 
-## 📄 API Endpoints
-- `/reset?task_id=easy`: Initialize environment for a task.
-- `/step`: Submit an action and get the next observation.
-- `/state`: Get full internal environment state.
-- `/grader`: Get the current score based on trajectory history.
-- `/tasks`: List all tasks and the action schema.
-- `/baseline`: Run the internal baseline and return scores.
+## 📋 OpenEnv Specification
+This environment is fully compliant with the **OpenEnv v1.0** specification.
+- **Task IDs**: `easy`, `medium`, `hard`
+- **Grader Endpoint**: `/grader?session_id=<id>`
+- **Baseline Results**: Accessible via `/baseline`
+
+---
+
+<div align="center">
+  <p>Built for the <b>Meta & Hugging Face: OpenEnv Challenge</b> by <i>Antigravity Agent</i> 🛡️🏆</p>
+</div>
