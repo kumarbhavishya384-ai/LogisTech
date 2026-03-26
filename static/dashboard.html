@@ -23,7 +23,8 @@
                 <div class="nav-item" onclick="switchTab('eval')">🤖 Agent Evaluation</div>
             </nav>
             <div class="sidebar-footer">
-                <button class="btn-logout" onclick="logout()">Sign Out</button>
+                <button class="btn-clear" onclick="clearAllData()">🗑️ Wipe Intelligence Data</button>
+                <button class="btn-logout" onclick="logout()" style="margin-top: 10px;">Sign Out</button>
             </div>
         </aside>
 
@@ -39,25 +40,16 @@
                 </div>
             </header>
 
-            <!-- TAB 1: OPERATIONAL MAP (LIVE DATA) -->
+            <!-- TAB 1: OPERATIONAL MAP (LIVE SIMULATION) -->
             <div id="tab-map" class="tab-view active">
                 <div class="stats-grid">
-                    <div class="stat-card glass">
-                        <span class="stat-label">Total Cash Balance</span>
-                        <h3 class="stat-val">$<span id="cash-bal">0.00</span></h3>
-                    </div>
-                    <div class="stat-card glass">
-                        <span class="stat-label">Total Revenue</span>
-                        <h3 class="stat-val">$<span id="revenue">0.00</span></h3>
-                    </div>
-                    <div class="stat-card glass">
-                        <span class="stat-label">System Health</span>
-                        <h3 class="stat-val"><span id="success-rate">0</span>%</h3>
-                    </div>
+                    <div class="stat-card glass"><span class="stat-label">Total Cash Balance</span><h3 class="stat-val">$<span id="cash-bal">0.00</span></h3><div class="stat-trend">Live Env</div></div>
+                    <div class="stat-card glass"><span class="stat-label">Total Revenue</span><h3 class="stat-val">$<span id="revenue">0.00</span></h3><div class="stat-trend">Live Env</div></div>
+                    <div class="stat-card glass"><span class="stat-label">System Health</span><h3 class="stat-val"><span id="success-rate">0</span>%</h3><div class="stat-trend">Live Env</div></div>
                 </div>
                 <div class="ops-grid">
                     <section class="ops-panel glass">
-                        <div class="panel-header"><h3>Live Environment</h3></div>
+                        <div class="panel-header"><h3>Environment Engine</h3></div>
                         <button class="btn-primary" onclick="startTask()">Reset & Start Environment</button>
                         <div class="table-container">
                             <table class="inventory-table">
@@ -72,67 +64,76 @@
                         <div class="form-group"><input type="text" id="ship-origin" placeholder="Origin ID"></div>
                         <div class="form-group"><input type="text" id="ship-dest" placeholder="Destination ID"></div>
                         <div class="form-group"><input type="number" id="ship-qty" placeholder="Quantity"></div>
-                        <button class="btn-action" onclick="createShipment()">Initiate Global Transfer</button>
+                        <button class="btn-primary" onclick="createShipment()">Initiate Global Transfer</button>
+
+                        <h3 style="margin-top: 30px;">Strategic Expansion</h3>
+                        <div class="form-group"><input type="text" id="new-wh-id" placeholder="Node ID (e.g WH_US)"></div>
+                        <div class="form-group"><input type="text" id="new-wh-loc" placeholder="Location"></div>
+                        <div class="form-group"><input type="number" id="new-wh-cap" placeholder="Capacity Units"></div>
+                        <button class="btn-primary" onclick="addBranch()">Expand Network Hub</button>
                     </aside>
                 </div>
             </div>
 
-            <!-- TAB 2: WAREHOUSE MANAGER (PREMIUM DUMMY DATA) -->
+            <!-- TAB 2: WAREHOUSE MANAGER (USER ENTRY) -->
             <div id="tab-wh" class="tab-view">
-                <div class="stats-grid">
-                    <div class="stat-card glass">
-                        <span class="stat-label">Total Storage Hubs</span>
-                        <h3 class="stat-val">12 Active</h3>
-                        <div class="stat-trend">+2 This Quarter</div>
-                    </div>
-                    <div class="stat-card glass">
-                        <span class="stat-label">Network Utilization</span>
-                        <h3 class="stat-val">68.4%</h3>
-                        <div class="stat-trend">Optimal Efficiency</div>
-                    </div>
-                </div>
-                <div class="table-container glass">
-                    <table class="inventory-table">
-                        <thead><tr><th>Branch</th><th>Manager</th><th>Op-Cost</th><th>Security Level</th></tr></thead>
-                        <tbody>
-                            <tr><td>WH_BERLIN_CENTER</td><td>Dr. Hans Müller</td><td>$4,200/mo</td><td><span class="badge badge-success">Mil-Grade</span></td></tr>
-                            <tr><td>WH_SHANGHAI_PORT</td><td>Mr. Wei Zhang</td><td>$8,900/mo</td><td><span class="badge badge-warning">High Risk</span></td></tr>
-                            <tr><td>WH_NEW_YORK_HUB</td><td>Sarah Collins</td><td>$12,400/mo</td><td><span class="badge badge-success">Standard</span></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 3: MARKET INSIGHTS (CHARTS) -->
-            <div id="tab-insights" class="tab-view">
                 <div class="ops-grid">
                     <section class="ops-panel glass">
-                        <h3>Global Demand Forecast</h3>
-                        <canvas id="demandChart" style="max-height: 400px;"></canvas>
+                        <h3>Global Node Registry</h3>
+                        <div class="table-container" style="border: none; padding: 0;">
+                            <table class="inventory-table">
+                                <thead><tr><th>Node ID</th><th>Location</th><th>Capacity</th><th>Type</th></tr></thead>
+                                <tbody id="node-registry">
+                                    <!-- Dynamic User Nodes -->
+                                    <tr class="dummy-row"><td>WH_BERLIN</td><td>Berlin Center</td><td>12,000</td><td>Distribution</td></tr>
+                                    <tr class="dummy-row"><td>WH_SHANGHAI</td><td>Shanghai Port</td><td>45,000</td><td>Shipping Hub</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                     <aside class="actions-panel glass">
-                        <h3>Intelligence Reports</h3>
-                        <div class="insight-alert warning">⚠️ Port Congestion detected in Panama Canal</div>
-                        <div class="insight-alert success">✅ GPU Demand rising in South-East Asia</div>
+                        <h3>Add New Hub</h3>
+                        <div class="form-group"><input type="text" id="reg-id" placeholder="Node ID (e.g WH_PARIS)"></div>
+                        <div class="form-group"><input type="text" id="reg-loc" placeholder="City/Country"></div>
+                        <div class="form-group"><input type="number" id="reg-cap" placeholder="Total Capacity"></div>
+                        <button class="btn-primary" onclick="registerUserNode()">Deploy Hub to Network</button>
                     </aside>
                 </div>
             </div>
 
-            <!-- TAB 4: AGENT EVALUATION -->
-            <div id="tab-eval" class="tab-view">
-                <section class="eval-hero glass">
-                    <h2>AI Agent Performance Metrics</h2>
-                    <p>Current Baseline Score: <strong style="color:var(--primary)">0.763</strong></p>
-                    <div class="matrix-grid">
-                        <div class="matrix-cell"><h4>Reasoning</h4><div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div></div>
-                        <div class="matrix-cell"><h4>Resilience</h4><div class="progress-bar"><div class="progress-fill" style="width: 42%; background:var(--secondary)"></div></div></div>
-                    </div>
-                </section>
+            <!-- TAB 3: FREIGHT LOGISTICS (SHIPMENT TRACKING) -->
+            <div id="tab-freight" class="tab-view">
+                <div class="ops-grid">
+                    <section class="ops-panel glass">
+                        <h3>Active Shipment Manifest</h3>
+                        <div class="table-container" style="border: none; padding: 0;">
+                            <table class="inventory-table">
+                                <thead><tr><th>Shipment ID</th><th>Origin → Destination</th><th>Route</th><th>Status</th></tr></thead>
+                                <tbody id="freight-manifest">
+                                    <!-- Dynamic User Shipments -->
+                                    <tr class="dummy-row"><td>#SHP-772</td><td>Berlin → UK</td><td>Land/Freight</td><td><span class="badge badge-success">In Transit</span></td></tr>
+                                    <tr class="dummy-row"><td>#SHP-901</td><td>Shanghai → Paris</td><td>Oceans</td><td><span class="badge badge-warning">Customs</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <aside class="actions-panel glass">
+                        <h3>Dispatch New Order</h3>
+                        <div class="form-group"><input type="text" id="f-id" placeholder="Shipment #ID"></div>
+                        <div class="form-group"><input type="text" id="f-route" placeholder="Route (e.g Air, Sea, Land)"></div>
+                        <div class="form-group"><input type="text" id="f-nodes" placeholder="Origin → Destination"></div>
+                        <button class="btn-primary" onclick="dispatchUserOrder()">Execute Dispatch</button>
+                    </aside>
+                </div>
             </div>
+
+            <!-- OTHER TABS (INSIGHTS/EVAL) -->
+            <div id="tab-insights" class="tab-view"><section class="ops-panel glass"><h3>Demand Intelligence Forecast</h3><canvas id="demandChart"></canvas></section></div>
+            <div id="tab-eval" class="tab-view"><section class="ops-panel glass"><h2>AI Agent Benchmark Evaluation</h2><p>Performance Delta: <strong style="color:var(--secondary)">+12.4%</strong></p></section></div>
 
         </main>
     </div>
 
-    <script src="/static/js/app.js"></script>
+    <script src="/static/js/app.js?v=platinum_v4"></script>
 </body>
 </html>

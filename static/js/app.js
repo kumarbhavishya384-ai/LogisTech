@@ -175,25 +175,76 @@ async function updateStats() {
     } catch (e) {}
 }
 
+function clearAllData() {
+    if(!confirm("Are you sure you want to wipe all Intelligence Visualization data?")) return;
+    document.querySelectorAll('.dummy-row').forEach(r => r.remove());
+    document.getElementById('node-registry').innerHTML = '';
+    document.getElementById('freight-manifest').innerHTML = '';
+    alert("Simulation Grid Cleared. You can now enter your own tactical data.");
+}
+
+function registerUserNode() {
+    const id = document.getElementById('reg-id').value;
+    const loc = document.getElementById('reg-loc').value;
+    const cap = document.getElementById('reg-cap').value;
+    if(!id || !loc || !cap) return alert("Please fill all fields.");
+
+    const row = document.createElement('tr');
+    row.className = 'user-row';
+    row.innerHTML = `<td><strong>${id}</strong></td><td>${loc}</td><td>${cap}</td><td><span class="badge badge-success">User Node</span></td>`;
+    document.getElementById('node-registry').appendChild(row);
+    alert(`Success: Hub ${id} deployed to global registry.`);
+}
+
+function dispatchUserOrder() {
+    const id = document.getElementById('f-id').value;
+    const route = document.getElementById('f-route').value;
+    const nodes = document.getElementById('f-nodes').value;
+    if(!id || !route || !nodes) return alert("Fill dispatch manifest first.");
+
+    const row = document.createElement('tr');
+    row.className = 'user-row success-row';
+    row.innerHTML = `<td>#${id}</td><td>${nodes}</td><td>${route}</td><td><span class="badge badge-success">Dispatched</span></td>`;
+    document.getElementById('freight-manifest').appendChild(row);
+    alert(`Order #${id} dispatched to logistics network.`);
+}
+
 function switchTab(tab) {
+    // 1. Reset all views and nav items
     document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
     
-    document.getElementById(`tab-${tab}`).classList.add('active');
-    event.currentTarget.classList.add('active');
+    // 2. Identify and activate the target view
+    const targetView = document.getElementById(`tab-${tab}`);
+    if (targetView) targetView.classList.add('active');
 
+    // 3. Highlight the correct sidebar item
+    // We use a query selector to find the exact tab clicked
+    const clickedItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.getAttribute('onclick')?.includes(tab));
+    if (clickedItem) clickedItem.classList.add('active');
+
+    // 4. Update the Strategic Titles
     const titles = {
         'map': ['Global Operations Dashboard', 'Live monitoring of supply chain network'],
         'wh': ['Warehouse Network Manager', 'Strategic expansion and capacity oversight'],
-        'freight': ['Freight Logistics Hub', 'Transcontinental shipment tracking'],
-        'insights': ['Market Intelligence', 'Predictive demand and route optimization'],
+        'freight': ['Freight Logistics Terminal', 'Active manifest and global shipment tracking'],
+        'insights': ['Market Intelligence AI', 'Predictive demand and route optimization'],
         'eval': ['Agent Evaluation Matrix', 'Performance analysis benchmarks']
     };
     
-    document.getElementById('view-title').textContent = titles[tab][0];
-    document.getElementById('view-tagline').textContent = titles[tab][1];
+    const titleEl = document.getElementById('view-title');
+    const taglineEl = document.getElementById('view-tagline');
+    
+    if (titleEl && titles[tab]) titleEl.textContent = titles[tab][0];
+    if (taglineEl && titles[tab]) taglineEl.textContent = titles[tab][1];
 
+    // 5. Initialize specialized tab features
     if (tab === 'insights') initInsightsChart();
+    
+    // 6. Manual update of stats if in Map view
+    if (tab === 'map') updateStats();
+
+    console.log(`Navigation: Switched to ${tab} view.`);
 }
 
 let chart = null;
