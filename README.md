@@ -1,3 +1,13 @@
+---
+title: LogisTech OpenEnv
+emoji: 🛡️
+colorFrom: indigo
+colorTo: pink
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # 🛡️ LogisTech-OpenEnv: Autonomous Global Supply Chain 
 
 ![LogisTech Banner](static/assets/dashboard_bg.png)
