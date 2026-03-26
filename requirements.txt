@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+openai
+python-dotenv
+numpy
+pandas
+pydantic-settings
+motor
+dnspython
+passlib[bcrypt]
+python-multipart
+pyjwt

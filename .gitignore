@@ -1,0 +1,13 @@
+# LogisTech-OpenEnv Git Ignore
+.env
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+*.log
+node_modules/
+.venv/
+env/
+venv/
+.idea/
+.vscode/
