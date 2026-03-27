@@ -34,7 +34,7 @@ async function auth(type) {
 async function requestOtp(mode = 'register') {
     currentOtpMode = mode;
     const email = document.getElementById(mode === 'register' ? 'r-email' : 'f-email').value;
-    if(!email) return alert("Please enter email first.");
+    if (!email) return alert("Please enter email first.");
     try {
         const res = await fetch(`${BASE_URL}/auth/otp/generate`, {
             method: 'POST',
@@ -46,18 +46,18 @@ async function requestOtp(mode = 'register') {
             email: email, passcode: otp, time: new Date(Date.now() + 15 * 60000).toLocaleTimeString()
         });
         document.getElementById('otp-modal').style.display = 'flex';
-        if(mode === 'forgot') {
+        if (mode === 'forgot') {
             document.getElementById('forgot-pass-group').style.display = 'block';
             document.getElementById('forgot-btn').textContent = "Verify & Update Password";
         }
-    } catch(e) {
+    } catch (e) {
         alert("Failed to send OTP.");
     }
 }
 
 async function verifyAndSubmit() {
     const otp = document.getElementById('otp-input').value;
-    if(!otp) return alert("Enter OTP");
+    if (!otp) return alert("Enter OTP");
     if (currentOtpMode === 'register') {
         const name = document.getElementById('r-name').value;
         const email = document.getElementById('r-email').value;
@@ -107,7 +107,7 @@ async function addBranch() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId, wh_id: id, location: loc, capacity: cap })
     });
-    if(res.ok) {
+    if (res.ok) {
         alert(`New branch ${id} added!`);
         updateStats();
     }
@@ -123,7 +123,7 @@ async function createShipment() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action_type: "TRANSFER", params: { sku: sku, origin: origin, destination: dest, quantity: qty } })
     });
-    if(res.ok) {
+    if (res.ok) {
         alert(`Shipment ${sku} created!`);
         updateStats();
     }
@@ -144,8 +144,10 @@ async function updateStats() {
     try {
         const res = await fetch(`${BASE_URL}/state?session_id=${sessionId}`);
         const state = await res.json();
-        document.getElementById('cash-bal').textContent = state.cash_balance.toFixed(2);
-        document.getElementById('revenue').textContent = state.total_revenue.toFixed(2);
+        if (manualCashBalance === null) {
+            document.getElementById('cash-bal').textContent = state.cash_balance.toFixed(2);
+            document.getElementById('revenue').textContent = state.total_revenue.toFixed(2);
+        }
         document.getElementById('unfilled').textContent = state.unfilled_orders;
         document.getElementById('current-day').textContent = `DAY ${state.current_day}`;
         const table = document.getElementById('inventory-table');
@@ -156,7 +158,7 @@ async function updateStats() {
             const totalInv = Object.values(wh.inventory).reduce((a, b) => a + b, 0);
             const usage = (totalInv / wh.capacity * 100).toFixed(1);
             const status = usage > 90 ? '<span class="badge badge-warning">Critical</span>' : '<span class="badge badge-success">Optimal</span>';
-            
+
             row.innerHTML = `
                 <td><strong>${wh.location}</strong><br><small style="color:var(--text-dim); text-transform: uppercase;">${wh.id}</small></td>
                 <td>${JSON.stringify(wh.inventory).replace(/[{}"]/g, '') || "Empty"}</td>
@@ -172,11 +174,11 @@ async function updateStats() {
         const successRate = (state.total_revenue / 50.0) / Math.max(1, (state.total_revenue / 50.0 + state.unfilled_orders)) * 100;
         const successRateId = document.getElementById('success-rate');
         if (successRateId) successRateId.textContent = successRate.toFixed(1);
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function clearAllData() {
-    if(!confirm("Are you sure you want to wipe all Intelligence Visualization data?")) return;
+    if (!confirm("Are you sure you want to wipe all Intelligence Visualization data?")) return;
     document.querySelectorAll('.dummy-row').forEach(r => r.remove());
     document.getElementById('node-registry').innerHTML = '';
     document.getElementById('freight-manifest').innerHTML = '';
@@ -187,7 +189,7 @@ function registerUserNode() {
     const id = document.getElementById('reg-id').value;
     const loc = document.getElementById('reg-loc').value;
     const cap = document.getElementById('reg-cap').value;
-    if(!id || !loc || !cap) return alert("Please fill all fields.");
+    if (!id || !loc || !cap) return alert("Please fill all fields.");
 
     const row = document.createElement('tr');
     row.className = 'user-row';
@@ -200,7 +202,7 @@ function dispatchUserOrder() {
     const id = document.getElementById('f-id').value;
     const route = document.getElementById('f-route').value;
     const nodes = document.getElementById('f-nodes').value;
-    if(!id || !route || !nodes) return alert("Fill dispatch manifest first.");
+    if (!id || !route || !nodes) return alert("Fill dispatch manifest first.");
 
     const row = document.createElement('tr');
     row.className = 'user-row success-row';
@@ -213,7 +215,7 @@ function switchTab(tab) {
     // 1. Reset all views and nav items
     document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(v => v.classList.remove('active'));
-    
+
     // 2. Identify and activate the target view
     const targetView = document.getElementById(`tab-${tab}`);
     if (targetView) targetView.classList.add('active');
@@ -231,16 +233,16 @@ function switchTab(tab) {
         'insights': ['Market Intelligence AI', 'Predictive demand and route optimization'],
         'eval': ['Agent Evaluation Matrix', 'Performance analysis benchmarks']
     };
-    
+
     const titleEl = document.getElementById('view-title');
     const taglineEl = document.getElementById('view-tagline');
-    
+
     if (titleEl && titles[tab]) titleEl.textContent = titles[tab][0];
     if (taglineEl && titles[tab]) taglineEl.textContent = titles[tab][1];
 
     // 5. Initialize specialized tab features
     if (tab === 'insights') initInsightsChart();
-    
+
     // 6. Manual update of stats if in Map view
     if (tab === 'map') updateStats();
 
@@ -274,3 +276,49 @@ function initInsightsChart() {
 
 setInterval(updateStats, 3000);
 updateStats();
+
+// --- Cash Balance Manual Entry ---
+let manualCashBalance = null;
+
+function openCashModal() {
+    const modal = document.getElementById('cash-modal');
+    modal.style.display = 'flex';
+    const cashInput = document.getElementById('cash-input');
+    const rateInput = document.getElementById('revenue-rate-input');
+    if (manualCashBalance !== null) cashInput.value = manualCashBalance;
+    cashInput.focus();
+
+    function updatePreview() {
+        const cash = parseFloat(cashInput.value) || 0;
+        const rate = parseFloat(rateInput.value) || 0;
+        document.getElementById('preview-revenue').textContent = (cash * rate / 100).toFixed(2);
+    }
+
+    cashInput.oninput = updatePreview;
+    rateInput.oninput = updatePreview;
+    updatePreview();
+}
+
+function closeCashModal() {
+    document.getElementById('cash-modal').style.display = 'none';
+}
+
+function confirmCashBalance() {
+    const cash = parseFloat(document.getElementById('cash-input').value);
+    const rate = parseFloat(document.getElementById('revenue-rate-input').value) || 0;
+    if (isNaN(cash) || cash < 0) return alert('Please enter a valid cash balance.');
+
+    manualCashBalance = cash;
+    const revenue = cash * rate / 100;
+
+    document.getElementById('cash-bal').textContent = cash.toFixed(2);
+    document.getElementById('revenue').textContent = revenue.toFixed(2);
+    document.getElementById('revenue-trend').textContent = `${rate}% of cash balance`;
+
+    closeCashModal();
+}
+
+// Close modal on backdrop click
+document.getElementById('cash-modal').addEventListener('click', function (e) {
+    if (e.target === this) closeCashModal();
+});

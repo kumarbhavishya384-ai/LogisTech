@@ -43,8 +43,12 @@
             <!-- TAB 1: OPERATIONAL MAP (LIVE SIMULATION) -->
             <div id="tab-map" class="tab-view active">
                 <div class="stats-grid">
-                    <div class="stat-card glass"><span class="stat-label">Total Cash Balance</span><h3 class="stat-val">$<span id="cash-bal">0.00</span></h3><div class="stat-trend">Live Env</div></div>
-                    <div class="stat-card glass"><span class="stat-label">Total Revenue</span><h3 class="stat-val">$<span id="revenue">0.00</span></h3><div class="stat-trend">Live Env</div></div>
+                    <div class="stat-card glass" id="cash-card" onclick="openCashModal()" style="cursor:pointer;" title="Click to set cash balance">
+                        <span class="stat-label">Total Cash Balance <span style="color:var(--primary);font-size:0.7rem;">✎ Edit</span></span>
+                        <h3 class="stat-val">$<span id="cash-bal">0.00</span></h3>
+                        <div class="stat-trend">Live Env</div>
+                    </div>
+                    <div class="stat-card glass"><span class="stat-label">Total Revenue</span><h3 class="stat-val">$<span id="revenue">0.00</span></h3><div class="stat-trend" id="revenue-trend">Live Env</div></div>
                     <div class="stat-card glass"><span class="stat-label">System Health</span><h3 class="stat-val"><span id="success-rate">0</span>%</h3><div class="stat-trend">Live Env</div></div>
                 </div>
                 <div class="ops-grid">
@@ -132,6 +136,29 @@
             <div id="tab-eval" class="tab-view"><section class="ops-panel glass"><h2>AI Agent Benchmark Evaluation</h2><p>Performance Delta: <strong style="color:var(--secondary)">+12.4%</strong></p></section></div>
 
         </main>
+    </div>
+
+    <!-- Cash Balance Modal -->
+    <div id="cash-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center;">
+        <div class="glass" style="padding:40px; border-radius:20px; width:380px; max-width:90vw;">
+            <h3 style="margin-bottom:8px;">Set Cash Balance</h3>
+            <p style="color:var(--text-dim); font-size:0.85rem; margin-bottom:24px;">Enter your total cash balance. Revenue will be calculated automatically.</p>
+            <div class="form-group">
+                <input type="number" id="cash-input" placeholder="e.g. 50000" min="0" step="0.01" style="font-size:1.1rem;">
+            </div>
+            <div class="form-group">
+                <label style="color:var(--text-dim); font-size:0.8rem; display:block; margin-bottom:8px;">Revenue Rate (%)</label>
+                <input type="number" id="revenue-rate-input" placeholder="e.g. 20" min="0" max="100" step="0.1" value="20">
+            </div>
+            <div style="background:rgba(99,102,241,0.08); border:1px solid var(--primary); border-radius:12px; padding:16px; margin-bottom:20px;">
+                <span style="color:var(--text-dim); font-size:0.8rem;">Calculated Revenue</span>
+                <div style="font-size:1.6rem; font-weight:700; color:var(--primary);">$<span id="preview-revenue">0.00</span></div>
+            </div>
+            <div style="display:flex; gap:12px;">
+                <button class="btn-primary" onclick="confirmCashBalance()" style="margin-top:0;">Confirm</button>
+                <button onclick="closeCashModal()" style="flex:1; padding:16px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:12px; color:var(--text-dim); cursor:pointer; font-weight:700;">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <script src="/static/js/app.js?v=platinum_v4"></script>
