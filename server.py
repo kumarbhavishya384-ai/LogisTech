@@ -20,7 +20,7 @@ load_dotenv()
 app = FastAPI(title="LogisTech-OpenEnv: Autonomous Supply Chain Environment")
 
 # MongoDB Setup
-MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
+MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017").strip()
 client = AsyncIOMotorClient(MONGODB_URL)
 db_client = client.logistech_db
 users_collection = db_client.users
@@ -28,8 +28,11 @@ otps_collection = db_client.otps
 
 @app.on_event("startup")
 async def startup_event():
-    # TTL Index: OTPs expire after 15 minutes (900 seconds)
-    await otps_collection.create_index("createdAt", expireAfterSeconds=900)
+    try:
+        # TTL Index: OTPs expire after 15 minutes (900 seconds)
+        await otps_collection.create_index("createdAt", expireAfterSeconds=900)
+    except Exception as e:
+        print(f"Warning: Could not create TTL index: {e}")
 
 # Security
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
