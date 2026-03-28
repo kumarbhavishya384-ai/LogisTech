@@ -3,19 +3,28 @@ version: "1.0.0"
 description: "High-Fidelity Supply Chain Disruptor & Optimization Environment. Agents manage global e-commerce supply chains, balancing inventory costs, shipping speeds, and satisfaction."
 author: "Antigravity Agent"
 tags: ["supply-chain", "management", "logistics", "sre", "rl", "agent"]
+
+runtime: "python3.10"
+entry_point: "inference.py"
+server: "server.py"
+
 tasks:
   - id: "easy"
     name: "The UK Stockout"
     description: "Transfer iPhone stock from the Germany warehouse to the UK warehouse to solve a stockout crisis."
     difficulty: "Easy"
+    target_score: 1.0
   - id: "medium"
     name: "Shanghai Port Strike"
     description: "A port strike has delayed sea shipments from Shanghai. Identify and reroute the critical MacBook shipment (S1) to Air freight."
     difficulty: "Medium"
+    target_score: 1.0
   - id: "hard"
     name: "Black Friday Resilience"
     description: "Manage a 3x seasonal demand surge while maintaining profitability and low unfilled order rates."
     difficulty: "Hard"
+    target_score: 1.0
+
 endpoints:
   reset: "/reset"
   step: "/step"
@@ -23,7 +32,37 @@ endpoints:
   tasks: "/tasks"
   grader: "/grader"
   baseline: "/baseline"
+
+action_space:
+  type: "dict"
+  fields:
+    action_type:
+      type: "str"
+      enum: ["TRANSFER", "REORDER", "REROUTE", "NOTIFY", "PRIORITIZE"]
+    params:
+      type: "dict"
+
+observation_space:
+  type: "dict"
+  fields:
+    warehouses:
+      type: "list"
+    active_shipments:
+      type: "list"
+    cash_balance:
+      type: "float"
+    market_demand:
+      type: "dict"
+    alerts:
+      type: "list"
+    current_day:
+      type: "int"
+
 action_space_description: "Dictionary containing action_type (TRANSFER, REORDER, REROUTE, NOTIFY, PRIORITIZE) and params (sku, origin, destination, quantity, id, mode, message)."
 observation_space_description: "Real-time snapshot of warehouses, active shipments, cash balance, demand factors, and system alerts."
-entry_point: "inference.py"
-server: "server.py"
+
+environment:
+  required_vars:
+    - API_BASE_URL
+    - MODEL_NAME
+    - HF_TOKEN
