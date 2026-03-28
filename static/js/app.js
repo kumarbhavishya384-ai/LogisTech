@@ -143,6 +143,12 @@ async function updateStats() {
     if (!sessionId) return;
     try {
         const res = await fetch(`${BASE_URL}/state?session_id=${sessionId}`);
+        if (res.status === 404) {
+            // Session expired (server restarted) — clear stale session
+            sessionId = "";
+            localStorage.removeItem('session_id');
+            return;
+        }
         const state = await res.json();
         if (manualCashBalance === null) {
             document.getElementById('cash-bal').textContent = state.cash_balance.toFixed(2);
