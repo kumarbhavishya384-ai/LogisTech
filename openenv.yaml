@@ -25,3 +25,5 @@ endpoints:
   baseline: "/baseline"
 action_space_description: "Dictionary containing action_type (TRANSFER, REORDER, REROUTE, NOTIFY, PRIORITIZE) and params (sku, origin, destination, quantity, id, mode, message)."
 observation_space_description: "Real-time snapshot of warehouses, active shipments, cash balance, demand factors, and system alerts."
+entry_point: "inference.py"
+server: "server.py"
