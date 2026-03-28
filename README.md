@@ -6,6 +6,12 @@ colorTo: pink
 sdk: docker
 app_port: 7860
 pinned: false
+secrets:
+  - MONGODB_URL
+  - SECRET_KEY
+  - API_BASE_URL
+  - MODEL_NAME
+  - OPENAI_API_KEY
 ---
 
 # 🛡️ LogisTech-OpenEnv: Autonomous Global Supply Chain 

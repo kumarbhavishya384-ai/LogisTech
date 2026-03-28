@@ -8,10 +8,10 @@ load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:7860")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")
-HF_TOKEN = os.getenv("HF_TOKEN", "")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 client = OpenAI(
-    api_key=HF_TOKEN,
+    api_key=OPENAI_API_KEY,
     base_url=API_BASE_URL if "openai" not in API_BASE_URL else None
 )
 
