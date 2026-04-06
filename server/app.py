@@ -40,7 +40,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "LOGISTECH_SUPER_SECRET")
 ALGORITHM = "HS256"
 
 # Mount static files
-static_dir = os.path.join(os.path.dirname(__file__), "static")
+root_dir = os.path.dirname(os.path.dirname(__file__))
+static_dir = os.path.join(root_dir, "static")
 if not os.path.exists(static_dir):
     os.makedirs(static_dir)
 
@@ -236,6 +237,9 @@ async def run_baseline():
         results[task_id] = LogisticsGrader.score(task_id, history)
     return {"baseline_results": results}
 
-if __name__ == "__main__":
+def main():
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7860)
+
+if __name__ == "__main__":
+    main()

@@ -25,6 +25,9 @@ dependencies = [
     "requests==2.31.0",
 ]
 
+[project.scripts]
+server = "server.app:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["*"]
@@ -34,7 +37,7 @@ name        = "LogisTech-OpenEnv"
 version     = "1.0.0"
 spec_version = 1
 runtime     = "fastapi"
-app         = "server:app"
+app         = "server.app:app"
 port        = 7860
 config      = "openenv.yaml"
 
