@@ -6,82 +6,118 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:7860")
-MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+# ── Mandatory env vars ────────────────────────────────────────────────────────
+# API_BASE_URL : injected by the evaluation platform (LiteLLM proxy endpoint)
+# API_KEY      : injected by the evaluation platform (LiteLLM proxy key)
+# MODEL_NAME   : model identifier for inference
+# HF_TOKEN     : Hugging Face / platform token (used for Space auth if needed)
+# ENV_URL      : base URL of the OpenEnv FastAPI server
+# ─────────────────────────────────────────────────────────────────────────────
+API_BASE_URL = os.environ["API_BASE_URL"]          # must come from environment
+API_KEY      = os.environ["API_KEY"]               # must come from environment
+MODEL_NAME   = os.getenv("MODEL_NAME", "gpt-4o-mini")
+HF_TOKEN     = os.getenv("HF_TOKEN", "")
+ENV_URL      = os.getenv("ENV_URL", "http://localhost:7860")
 
+# Always initialise with the injected LiteLLM proxy credentials
 client = OpenAI(
-    api_key=OPENAI_API_KEY,
-    base_url=API_BASE_URL if "openai" not in API_BASE_URL else None
+    api_key=API_KEY,
+    base_url=API_BASE_URL,
 )
-
-ENV_URL = os.getenv("ENV_URL", "http://localhost:7860")
 
 
 def get_llm_action(observation: dict, task_id: str) -> dict:
-    """Use OpenAI client to decide the next action based on observation."""
-    prompt = f"""You are a logistics AI agent managing a supply chain.
-Task: {task_id}
-Current Observation: {json.dumps(observation, indent=2)}
-
-Choose ONE action from: TRANSFER, REORDER, REROUTE, NOTIFY, PRIORITIZE.
-Respond ONLY with valid JSON like:
-{{"action_type": "TRANSFER", "params": {{"sku": "SKU_IPHONE", "origin": "WH_DE", "destination": "WH_UK", "quantity": 100}}}}"""
-
+    """Call the LLM via the injected API_BASE_URL proxy to choose an action."""
+    prompt = (
+        "You are a logistics AI agent managing a global supply chain.\n"
+        f"Task: {task_id}\n"
+        f"Current Observation:\n{json.dumps(observation, indent=2)}\n\n"
+        "Choose ONE action from: TRANSFER, REORDER, REROUTE, NOTIFY, PRIORITIZE.\n"
+        "Respond ONLY with valid JSON, for example:\n"
+        '{"action_type": "TRANSFER", "params": {"sku": "SKU_IPHONE", '
+        '"origin": "WH_DE", "destination": "WH_UK", "quantity": 100}}'
+    )
     try:
         response = client.chat.completions.create(
             model=MODEL_NAME,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
-            max_tokens=200
+            max_tokens=200,
         )
         content = response.choices[0].message.content.strip()
-        # Extract JSON from response
         start = content.find("{")
-        end = content.rfind("}") + 1
+        end   = content.rfind("}") + 1
         return json.loads(content[start:end])
-    except Exception as e:
-        print(f"LLM call failed: {e}, using fallback NOTIFY action")
+    except Exception as exc:
+        print(f"[WARN] LLM call failed: {exc}. Using fallback NOTIFY action.")
         return {"action_type": "NOTIFY", "params": {"message": "monitoring"}}
 
 
 def run_task(task_id: str) -> float:
-    print(f"--- Running Task: {task_id} ---")
+    # ── [START] ───────────────────────────────────────────────────────────────
+    print(json.dumps({
+        "event":   "[START]",
+        "task_id": task_id,
+        "model":   MODEL_NAME,
+        "env_url": ENV_URL,
+    }))
 
-    response = requests.post(f"{ENV_URL}/reset", params={"task_id": task_id})
-    if response.status_code != 200:
-        print(f"Failed to reset: {response.text}")
+    # Reset the environment for this task
+    reset_resp = requests.post(f"{ENV_URL}/reset", params={"task_id": task_id})
+    if reset_resp.status_code != 200:
+        print(f"[ERROR] Failed to reset task '{task_id}': {reset_resp.text}")
         return 0.0
 
-    data = response.json()
+    data       = reset_resp.json()
     session_id = data["session_id"]
     observation = data["observation"]
 
-    done = False
-    steps = 0
+    done      = False
+    step_num  = 0
     max_steps = 30
 
-    while not done and steps < max_steps:
+    while not done and step_num < max_steps:
         action = get_llm_action(observation, task_id)
 
-        step_response = requests.post(
+        step_resp = requests.post(
             f"{ENV_URL}/step",
             params={"session_id": session_id},
-            json=action
+            json=action,
         )
 
-        if step_response.status_code != 200:
-            print(f"Step failed: {step_response.text}")
+        if step_resp.status_code != 200:
+            print(f"[ERROR] Step {step_num} failed: {step_resp.text}")
             break
 
-        step_data = step_response.json()
+        step_data   = step_resp.json()
+        reward_val  = step_data.get("reward", {})
         observation = step_data["observation"]
-        done = step_data["done"]
-        steps += 1
+        done        = step_data["done"]
 
-    grader_response = requests.get(f"{ENV_URL}/grader", params={"session_id": session_id})
-    score = grader_response.json()["score"]
-    print(f"Task {task_id} Finished. Score: {score}")
+        # ── [STEP] ────────────────────────────────────────────────────────────
+        print(json.dumps({
+            "event":      "[STEP]",
+            "task_id":    task_id,
+            "step":       step_num,
+            "action":     action,
+            "reward":     reward_val,
+            "done":       done,
+        }))
+
+        step_num += 1
+
+    # Final grade
+    grader_resp = requests.get(f"{ENV_URL}/grader", params={"session_id": session_id})
+    score = grader_resp.json().get("score", 0.0)
+
+    # ── [END] ─────────────────────────────────────────────────────────────────
+    print(json.dumps({
+        "event":      "[END]",
+        "task_id":    task_id,
+        "steps_used": step_num,
+        "score":      score,
+    }))
+
     return score
 
 

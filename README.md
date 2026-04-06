@@ -10,8 +10,9 @@ secrets:
   - MONGODB_URL
   - SECRET_KEY
   - API_BASE_URL
+  - API_KEY
   - MODEL_NAME
-  - OPENAI_API_KEY
+  - HF_TOKEN
 ---
 
 # 🛡️ LogisTech-OpenEnv: Autonomous Global Supply Chain 
@@ -58,12 +59,22 @@ secrets:
 ### 2. Environment Setup
 Create a `.env` file in the root directory:
 ```env
+# Server / Auth
 MONGODB_URL=your_mongodb_url
 SECRET_KEY=LOGISTECH_SUPER_SECRET
+
+# EmailJS (OTP)
 EMAILJS_SERVICE_ID=...
 EMAILJS_TEMPLATE_OTP=...
 EMAILJS_TEMPLATE_WELCOME=...
 EMAILJS_PUBLIC_KEY=...
+
+# Injected by evaluation platform – required for inference.py
+API_BASE_URL=https://your-litellm-proxy-endpoint
+API_KEY=your_api_key
+MODEL_NAME=gpt-4o-mini
+HF_TOKEN=your_hf_token
+ENV_URL=http://localhost:7860
 ```
 
 ### 3. Run Locally
