@@ -28,7 +28,7 @@ from openai import OpenAI
 load_dotenv()
 
 # ── Credentials — evaluation platform injects these ──────────────────────────
-API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN", "")
+API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN", "dummy-key")
 API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
 MODEL_NAME   = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
 ENV_URL      = os.getenv("ENV_URL", "http://localhost:7860")

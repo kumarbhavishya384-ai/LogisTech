@@ -21,7 +21,7 @@ app = FastAPI(title="LogisTech-OpenEnv: Autonomous Supply Chain Environment")
 
 # MongoDB Setup
 MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017").strip()
-client = AsyncIOMotorClient(MONGODB_URL)
+client = AsyncIOMotorClient(MONGODB_URL, serverSelectionTimeoutMS=2000)
 db_client = client.logistech_db
 users_collection = db_client.users
 otps_collection = db_client.otps
