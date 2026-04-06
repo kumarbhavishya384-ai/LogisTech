@@ -4,3 +4,103 @@ type: space
 runtime: fastapi
 app: server:app
 port: 7860
+
+# Human-readable metadata
+description: >
+  Autonomous global supply chain simulation environment.
+  Agents must manage warehouses, shipments, and inventory
+  across London, Berlin, and Shanghai under disruption scenarios.
+
+# Task definitions — each must expose a grader returning score in [0.0, 1.0]
+tasks:
+  - id: easy
+    name: "The UK Stockout"
+    description: "Transfer iPhone stock from Berlin (WH_DE) to London (WH_UK) before stockout."
+    difficulty: easy
+    max_steps: 30
+    target_score: 1.0
+
+  - id: medium
+    name: "Shanghai Port Strike"
+    description: "Reroute shipment S1 to AIR freight to bypass the port strike."
+    difficulty: medium
+    max_steps: 30
+    target_score: 1.0
+
+  - id: hard
+    name: "Black Friday Resilience"
+    description: "Maintain profitability and fulfil 80%+ orders during a holiday demand surge."
+    difficulty: hard
+    max_steps: 30
+    target_score: 1.0
+
+# OpenEnv-standard REST endpoints
+endpoints:
+  reset:
+    method: POST
+    path: /reset
+    params:
+      task_id:
+        type: string
+        default: easy
+        description: "Task to initialise (easy | medium | hard)"
+    response:
+      session_id: string
+      observation: object
+
+  step:
+    method: POST
+    path: /step
+    params:
+      session_id:
+        type: string
+        required: true
+    body: LogisticsAction
+    response:
+      observation: object
+      reward: object
+      done: boolean
+      info: object
+
+  state:
+    method: GET
+    path: /state
+    params:
+      session_id:
+        type: string
+        required: true
+
+  grader:
+    method: GET
+    path: /grader
+    params:
+      session_id:
+        type: string
+        required: true
+    response:
+      score:
+        type: number
+        range: [0.0, 1.0]
+      task_id: string
+
+# Inference entrypoint (used by the evaluation platform)
+inference:
+  script: inference.py
+  env:
+    API_BASE_URL:
+      required: true
+      description: "LiteLLM proxy endpoint (injected by platform)"
+    API_KEY:
+      required: true
+      description: "LiteLLM proxy API key (injected by platform)"
+    HF_TOKEN:
+      required: false
+      description: "Hugging Face token (accepted as fallback for API_KEY)"
+    MODEL_NAME:
+      required: false
+      default: "Qwen/Qwen2.5-72B-Instruct"
+      description: "Model identifier for inference"
+    ENV_URL:
+      required: false
+      default: "http://localhost:7860"
+      description: "Base URL of the LogisTech OpenEnv server"
