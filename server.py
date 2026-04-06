@@ -50,6 +50,11 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 async def root():
     return FileResponse(os.path.join(static_dir, "index.html"))
 
+@app.get("/health")
+async def health():
+    """Health check endpoint required by OpenEnv multi-mode deployment."""
+    return {"status": "ok", "env": "LogisTech-OpenEnv", "version": "1.0.0"}
+
 @app.get("/dashboard")
 async def dashboard():
     return FileResponse(os.path.join(static_dir, "dashboard.html"))

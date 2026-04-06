@@ -9,6 +9,7 @@ description = "LogisTech OpenEnv – Autonomous Global Supply Chain Environment"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "openenv-core",
     "fastapi==0.111.0",
     "uvicorn==0.29.0",
     "pydantic==2.7.1",
@@ -27,3 +28,25 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["*"]
+
+[tool.openenv]
+name        = "LogisTech-OpenEnv"
+version     = "1.0.0"
+spec_version = 1
+runtime     = "fastapi"
+app         = "server:app"
+port        = 7860
+config      = "openenv.yaml"
+
+[tool.openenv.tasks]
+ids         = ["easy", "medium", "hard"]
+
+[tool.openenv.endpoints]
+reset  = "POST /reset"
+step   = "POST /step"
+state  = "GET /state"
+grader = "GET /grader"
+health = "GET /health"
+
+[tool.openenv.inference]
+script = "inference.py"
