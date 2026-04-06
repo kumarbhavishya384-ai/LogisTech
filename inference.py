@@ -28,10 +28,16 @@ from openai import OpenAI
 load_dotenv()
 
 # ── Credentials — evaluation platform injects these ──────────────────────────
-API_KEY      = os.getenv("API_KEY") or os.getenv("HF_TOKEN", "dummy-key")
-API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
-MODEL_NAME   = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
-ENV_URL      = os.getenv("ENV_URL", "http://localhost:7860")
+raw_key = os.getenv("API_KEY") or os.getenv("HF_TOKEN") or "dummy-key"
+API_KEY = raw_key.strip() if raw_key else "dummy-key"
+
+raw_base_url = os.getenv("API_BASE_URL", "").strip()
+API_BASE_URL = raw_base_url if raw_base_url else "https://router.huggingface.co/v1"
+if not API_BASE_URL.startswith("http"):
+    API_BASE_URL = "https://" + API_BASE_URL
+
+MODEL_NAME   = os.getenv("MODEL_NAME", "").strip() or "Qwen/Qwen2.5-72B-Instruct"
+ENV_URL      = os.getenv("ENV_URL", "http://localhost:7860").strip()
 
 BENCHMARK    = "logistech-openenv"
 MAX_STEPS    = 30
