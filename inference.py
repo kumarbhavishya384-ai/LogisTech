@@ -186,12 +186,12 @@ def run_task(task_id: str) -> float:
             f"{ENV_URL}/grader", params={"session_id": session_id}, timeout=30
         )
         raw_score = grader_resp.json().get("score", 0.0)
-        score   = float(min(max(raw_score, 0.0), 1.0))   # clamp to [0, 1]
+        score   = float(min(max(raw_score, 0.01), 0.99))   # clamp strictly to (0, 1)
         success = score >= SUCCESS_THRESHOLD
 
     except Exception as exc:
         print(f"[DEBUG] Episode error for task '{task_id}': {exc}", flush=True)
-        score   = 0.0
+        score   = 0.01
         success = False
 
     finally:

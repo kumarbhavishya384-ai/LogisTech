@@ -15,7 +15,7 @@ class LogisticsGrader:
         episode_history is a list of dicts: {'observation', 'action', 'reward', 'done', 'info', 'state'}
         """
         if not episode_history:
-            return 0.0
+            return 0.01
         
         final_state = episode_history[-1]['state']
         
@@ -26,10 +26,10 @@ class LogisticsGrader:
             uk_stock = any(h['state']['warehouses']['WH_UK']['inventory'].get('SKU_IPHONE', 0) > 0 for h in episode_history)
             
             if transfer_taken and uk_stock:
-                return 1.0
+                return 0.99
             elif transfer_taken:
                 return 0.5 # Partial credit for trying
-            return 0.0
+            return 0.01
 
         elif task_id == "medium":
             # Target: Reroute S1 to AIR.
@@ -45,10 +45,10 @@ class LogisticsGrader:
             success_rate = final_state['total_revenue'] / max(1, (final_state['total_revenue'] + final_state['unfilled_orders'] * 50))
             
             if rerouted and success_rate > 0.6:
-                return 1.0
+                return 0.99
             elif rerouted:
                 return 0.7
-            return 0.0
+            return 0.01
 
         elif task_id == "hard":
             # Target: Profitability during Black Friday.
@@ -58,14 +58,14 @@ class LogisticsGrader:
             unfilled = final_state['unfilled_orders']
             
             if profit > 50000 and unfilled < 200:
-                return 1.0
+                return 0.99
             elif profit > 20000 and unfilled < 500:
                 return 0.8
             elif profit > 0:
                 return 0.4
-            return 0.0
+            return 0.01
 
-        return 0.0
+        return 0.01
 
 def get_tasks_list():
     return [
@@ -74,20 +74,20 @@ def get_tasks_list():
             "name": "The UK Stockout",
             "description": "The UK warehouse is out of iPhones. Transfer stock from the Berlin (DE) warehouse to resolve the crisis.",
             "difficulty": "Easy",
-            "target_score": 1.0
+            "target_score": 0.99
         },
         {
             "id": "medium",
             "name": "Shanghai Port Strike",
             "description": "A port strike has delayed sea shipments from Shanghai. Reroute critical MacBook shipments to Air freight to ensure availability in Germany.",
             "difficulty": "Medium",
-            "target_score": 1.0
+            "target_score": 0.99
         },
         {
             "id": "hard",
             "name": "Black Friday Resilience",
             "description": "Holiday surge is coming! Manage surging demand for all SKUs while keeping costs low and fulfilling at least 80% of orders.",
             "difficulty": "Hard",
-            "target_score": 1.0
+            "target_score": 0.99
         }
     ]
