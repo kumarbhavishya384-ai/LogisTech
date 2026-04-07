@@ -43,8 +43,8 @@ BENCHMARK    = "logistech-openenv"
 MAX_STEPS    = 30
 SUCCESS_THRESHOLD = 0.5   # score >= this → success=true
 
-# OpenAI client always routed through the injected proxy
-client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+# OpenAI client will be instantiated lazily in get_llm_action
+client = None
 
 
 # ── Mandatory stdout helpers ───────────────────────────────────────────────────
@@ -101,6 +101,10 @@ def get_llm_action(observation: dict, task_id: str, step: int) -> dict:
         "Choose the best single action as JSON."
     )
     try:
+        global client
+        if client is None:
+            client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+            
         resp = client.chat.completions.create(
             model=MODEL_NAME,
             messages=[
