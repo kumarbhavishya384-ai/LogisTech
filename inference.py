@@ -27,14 +27,17 @@ from openai import OpenAI
 
 load_dotenv()
 
-# ── Credentials — evaluation platform injects these ──────────────────────────
-raw_key = os.getenv("API_KEY") or os.getenv("HF_TOKEN") or "dummy-key"
-API_KEY = raw_key.strip() if raw_key else "dummy-key"
+# Make sure os.environ has the keys so it doesn't crash locally
+if not os.environ.get("API_BASE_URL"):
+    os.environ["API_BASE_URL"] = "https://router.huggingface.co/v1"
+if not os.environ.get("API_KEY"):
+    os.environ["API_KEY"] = "dummy-key"
 
-raw_base_url = os.getenv("API_BASE_URL", "").strip()
-API_BASE_URL = raw_base_url if raw_base_url else "https://router.huggingface.co/v1"
-if not API_BASE_URL.startswith("http"):
-    API_BASE_URL = "https://" + API_BASE_URL
+# EXACT SYNTAX REQUIRED BY VALIDATOR
+client = OpenAI(
+    base_url=os.environ["API_BASE_URL"],
+    api_key=os.environ["API_KEY"],
+)
 
 MODEL_NAME   = os.getenv("MODEL_NAME", "").strip() or "Qwen/Qwen2.5-72B-Instruct"
 ENV_URL      = os.getenv("ENV_URL", "http://localhost:7860").strip()
@@ -43,8 +46,6 @@ BENCHMARK    = "logistech-openenv"
 MAX_STEPS    = 30
 SUCCESS_THRESHOLD = 0.5   # score >= this → success=true
 
-# OpenAI client will be instantiated lazily in get_llm_action
-client = None
 
 
 # ── Mandatory stdout helpers ───────────────────────────────────────────────────
@@ -102,9 +103,6 @@ def get_llm_action(observation: dict, task_id: str, step: int) -> dict:
     )
     try:
         global client
-        if client is None:
-            client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-            
         resp = client.chat.completions.create(
             model=MODEL_NAME,
             messages=[
