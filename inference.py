@@ -29,7 +29,7 @@ load_dotenv()
 
 # Make sure os.environ has the keys so it doesn't crash locally
 if not os.environ.get("API_BASE_URL"):
-    os.environ["API_BASE_URL"] = "https://router.huggingface.co/v1"
+    os.environ["API_BASE_URL"] = "http://localhost:8000/v1"
 if not os.environ.get("API_KEY"):
     os.environ["API_KEY"] = "dummy-key"
 
